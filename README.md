@@ -15,6 +15,9 @@
 - **Realistic motion:** each servo turns at its rated speed and shows the estimated load from the servos it carries.
 - **Horn and link options:** single, double and cross horns, links of any length, and custom colors.
 - **Ray tracing (optional):** path-traced lighting similar to Blender Cycles. It refines only when nothing moves and throttles itself on slower PCs.
+- **Motion steps:** save poses as steps and press Play to watch your build run through them at real servo speed.
+- **Arduino code export:** get a ready-to-upload sketch for Arduino Uno/Nano/Mega or ESP32, with pin choices, smooth synchronised moves, and timing taken from each servo's rated speed. Copy it or download it as a `.ino` file.
+- **Parts list:** see every part you need (servos, links, brackets, board, power supply), with shop links.
 - **Saves automatically** in your browser. You can also export and import builds as text.
 
 ## Controls
@@ -40,6 +43,12 @@ It loads [three.js](https://threejs.org) from a CDN, so it needs an internet con
 - [three.js](https://github.com/mrdoob/three.js) (MIT)
 - [three-gpu-pathtracer](https://github.com/gkjohnson/three-gpu-pathtracer) (MIT)
 - [three-mesh-bvh](https://github.com/gkjohnson/three-mesh-bvh) (MIT)
+
+## Support
+
+Servo Bench is free and ad-free. If it helped you, press the ❤ **Support** button in the app, star this repo, or share it with a friend.
+
+**Maintainers:** donation buttons and the Amazon affiliate tag are set in the `window.SERVO_BENCH` block near the end of `index.html`. A service only shows up once you fill in its username.
 
 ## License
 

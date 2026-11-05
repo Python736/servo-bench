@@ -211,12 +211,45 @@ details[open] summary { margin-bottom: 12px; color: var(--fg); }
 label.f { display: grid; gap: 4px; font-size: 12.5px; color: var(--muted); min-width: 0; }
 .confirm { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding: 10px 12px; margin: 0 16px 12px; border-radius: 10px; background: var(--accent-soft); font-size: 14px; }
 .foot { font-size: 12px; color: var(--faint); margin: 0; }
-.support { display: flex; gap: 6px; flex-wrap: wrap; }
-.support a { display: inline-flex; align-items: center; gap: 7px; font: 600 13.5px var(--ui); text-decoration: none; border-radius: 8px; padding: 6px 11px; border: 1px solid var(--line); color: var(--fg); background: var(--field); transition: border-color 0.15s, filter 0.15s; }
-.support a:hover { border-color: var(--accent); }
-.support a svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; flex: none; }
-.support a.coffee { background: #ffdd00; color: #1a1300; border-color: transparent; }
-.support a.coffee:hover { filter: brightness(1.05); border-color: transparent; }
+.btn svg, .lnk svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.btn.ic { display: inline-flex; align-items: center; gap: 7px; }
+.big2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.big2 .btn { padding: 9px 10px; justify-content: center; font-weight: 600; }
+.lnk { display: inline-flex; align-items: center; gap: 7px; font: 600 13.5px var(--ui); text-decoration: none; border-radius: 8px; padding: 7px 12px; border: 1px solid var(--line); color: var(--fg); background: var(--field); cursor: pointer; transition: border-color 0.15s, filter 0.15s; }
+.lnk:hover { border-color: var(--accent); }
+.tb.heart svg { stroke: #e0465a; }
+
+/* dialogs */
+dialog.modal { border: 1px solid var(--line); border-radius: 16px; padding: 0; background: var(--panel); color: var(--fg); width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 48px); box-shadow: 0 24px 70px rgba(0,0,0,0.35); }
+dialog.modal.wide { width: min(760px, calc(100vw - 32px)); }
+dialog.modal::backdrop { background: rgba(10, 14, 12, 0.45); backdrop-filter: blur(3px); }
+.m-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 18px 12px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--panel); z-index: 1; }
+.m-head h2 { margin: 0; font: 700 19px var(--ui); }
+.m-head p { margin: 2px 0 0; font-size: 13px; color: var(--muted); }
+.m-body { padding: 16px 18px 18px; display: grid; gap: 14px; }
+.m-body h4 { margin: 0; font: 700 11.5px var(--ui); letter-spacing: 0.13em; text-transform: uppercase; color: var(--muted); }
+.donate { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.donate a { display: grid; gap: 2px; padding: 12px 14px; border-radius: 12px; text-decoration: none; color: #fff; background: var(--c); font: 700 15px var(--ui); transition: transform 0.12s, filter 0.12s; }
+.donate a small { font: 500 12px var(--ui); opacity: 0.85; }
+.donate a:hover { transform: translateY(-1px); filter: brightness(1.06); }
+.donate a.dark-ink { color: #1a1300; }
+.free { display: flex; gap: 8px; flex-wrap: wrap; }
+.tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+.tbl th { text-align: left; font: 600 11.5px var(--ui); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding: 6px 8px; border-bottom: 1px solid var(--line); }
+.tbl td { padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.tbl td.n { font: 600 14px var(--mono); text-align: right; width: 46px; }
+.tbl td.shop { white-space: nowrap; text-align: right; }
+.tbl td.shop a { color: var(--accent); font-weight: 600; text-decoration: none; margin-left: 10px; font-size: 13px; }
+.tbl td.shop a:hover { text-decoration: underline; }
+.tbl select { width: auto; padding: 3px 6px; font: 13px var(--mono); }
+.steps { display: grid; gap: 4px; }
+.step { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 6px 8px; border-radius: 9px; background: var(--panel-2); font-size: 13px; }
+.step b { font: 600 12px var(--mono); color: var(--muted); }
+.step span { font: 12px var(--mono); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.step.on { background: var(--accent-soft); }
+.step .x { font-size: 16px; }
+pre.code { margin: 0; max-height: 300px; overflow: auto; background: var(--field); border: 1px solid var(--line); border-radius: 10px; padding: 12px; font: 12px/1.5 var(--mono); white-space: pre; tab-size: 2; }
+.warnbox { font-size: 13px; padding: 9px 12px; border-radius: 10px; background: color-mix(in srgb, var(--warn) 14%, transparent); color: var(--fg); margin: 0; }
 
 .toast { position: fixed; left: 50%; top: calc(18px + env(safe-area-inset-top, 0px)); transform: translateX(-50%); background: var(--fg); color: var(--bg); padding: 9px 16px; border-radius: 999px; font-size: 14px; font-weight: 500; z-index: 20; max-width: calc(100% - 32px); box-shadow: var(--shadow); }
 
@@ -252,6 +285,9 @@ label.f { display: grid; gap: 4px; font-size: 12.5px; color: var(--muted); min-w
         <span class="tsep"></span>
         <button class="tb" id="t-clear" type="button" title="Clear drawn paths"><svg viewBox="0 0 24 24"><path d="M3 17c3-6 6 2 9-4s6 0 9-6"/><path d="M4 21L20 5"/></svg><span class="lbl-long">Clear paths</span></button>
         <button class="tb" id="t-view" type="button" title="Frame the whole build"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span class="lbl-long">Fit view</span></button>
+      </div>
+      <div class="tgroup glass">
+        <button class="tb heart" id="t-support" type="button" title="Support Servo Bench"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg><span class="lbl-long">Support</span></button>
       </div>
     </div>
 
@@ -314,6 +350,21 @@ label.f { display: grid; gap: 4px; font-size: 12.5px; color: var(--muted); min-w
     </section>
 
     <section>
+      <div class="sh"><span>Build it for real</span></div>
+      <div class="big2">
+        <button class="btn ic" id="b-code" type="button"><svg viewBox="0 0 24 24"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M13.5 4l-3 16"/></svg>Arduino code</button>
+        <button class="btn ic" id="b-parts" type="button"><svg viewBox="0 0 24 24"><path d="M3 4h2l2.4 11h11L21 7H6.2"/><circle cx="9" cy="19.5" r="1.4"/><circle cx="17" cy="19.5" r="1.4"/></svg>Parts list</button>
+      </div>
+      <div class="sh"><span>Motion steps</span><span class="val" id="steps-count"></span></div>
+      <div class="steps" id="steps"></div>
+      <div class="btns">
+        <button class="btn ic" id="b-step" type="button"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Save pose as step</button>
+        <button class="btn ic" id="b-play" type="button"><svg viewBox="0 0 24 24"><path d="M7 5l12 7-12 7z"/></svg><span>Play</span></button>
+      </div>
+      <p class="note">Pose your build, save it as a step, repeat. Play runs the steps at real servo speed, and the Arduino code does the same on real hardware.</p>
+    </section>
+
+    <section>
       <label class="switch">Move at real SG90 speed <input type="checkbox" id="g-real"></label>
       <details>
         <summary>Save or share a build</summary>
@@ -325,16 +376,67 @@ label.f { display: grid; gap: 4px; font-size: 12.5px; color: var(--muted); min-w
         </div>
       </details>
       <p class="foot">Dimensions and ratings are typical datasheet values at 4.8–5 V. Builds save in this browser.</p>
-      <!-- Support links: replace YOUR_USERNAME with your own names. A link that still says YOUR_USERNAME stays hidden. -->
-      <div class="support" id="support">
-        <a class="coffee" href="https://buymeacoffee.com/YOUR_USERNAME" target="_blank" rel="noopener" title="Support Servo Bench"><svg viewBox="0 0 24 24"><path d="M4 8h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"/><path d="M17 10h1.5a2.5 2.5 0 0 1 0 5H17"/><path d="M8 2.5v2.5M12 2.5v2.5"/></svg>Buy me a coffee</a>
-        <a href="https://github.com/Python736/servo-bench" target="_blank" rel="noopener" title="Source code on GitHub"><svg viewBox="0 0 24 24"><path d="M9 19c-4 1.3-4-2-6-2.5M15 21v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12 12 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg>GitHub</a>
+      <div class="btns">
+        <button class="lnk" id="b-support2" type="button"><svg viewBox="0 0 24 24" style="stroke:#e0465a"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>Support this project</button>
+        <a class="lnk" id="gh-link" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M9 19c-4 1.3-4-2-6-2.5M15 21v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12 12 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg>GitHub</a>
       </div>
-      <script>document.querySelectorAll('#support a').forEach(a => { if (a.href.includes('YOUR_USERNAME')) a.hidden = true; });</script>
     </section>
   </aside>
 </div>
+
+<dialog class="modal" id="dlg-support" aria-labelledby="sup-title">
+  <div class="m-head"><div><h2 id="sup-title">Support Servo Bench</h2><p>Free, open source and ad-free, made by one person.</p></div><button class="x" type="button" data-close aria-label="Close">×</button></div>
+  <div class="m-body">
+    <div id="donate-wrap"><h4>Donate</h4><div class="donate" id="donate" style="margin-top:8px"></div></div>
+    <div><h4>Free ways to help</h4><div class="free" style="margin-top:8px">
+      <a class="lnk" id="sup-star" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>Star on GitHub</a>
+      <button class="lnk" id="sup-share" type="button"><svg viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>Copy link to share</button>
+      <a class="lnk" id="sup-issue" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg>Suggest a feature</a>
+    </div></div>
+  </div>
+</dialog>
+
+<dialog class="modal wide" id="dlg-code" aria-labelledby="code-title">
+  <div class="m-head"><div><h2 id="code-title">Arduino code</h2><p>Ready-to-upload sketch that moves your real servos like the simulation.</p></div><button class="x" type="button" data-close aria-label="Close">×</button></div>
+  <div class="m-body">
+    <div class="grid2">
+      <label class="f">Board<select id="c-board"><option value="uno">Arduino Uno / Nano / Mega</option><option value="esp32">ESP32</option></select></label>
+      <label class="f">Pause at each step<select id="c-hold"><option value="0">none</option><option value="250">0.25 s</option><option value="500" selected>0.5 s</option><option value="1000">1 s</option><option value="2000">2 s</option></select></label>
+    </div>
+    <div><h4>Wiring: signal (orange) wire to pin</h4><table class="tbl" style="margin-top:6px"><tbody id="c-pins"></tbody></table></div>
+    <p class="warnbox" id="c-warn" hidden></p>
+    <pre class="code" id="c-out"></pre>
+    <div class="btns"><button class="btn primary ic" id="c-copy" type="button">Copy code</button><button class="btn ic" id="c-dl" type="button">Download .ino</button></div>
+    <p class="note" id="c-lib"></p>
+  </div>
+</dialog>
+
+<dialog class="modal" id="dlg-parts" aria-labelledby="parts-title">
+  <div class="m-head"><div><h2 id="parts-title">Parts list</h2><p>Everything you need to build this for real.</p></div><button class="x" type="button" data-close aria-label="Close">×</button></div>
+  <div class="m-body">
+    <table class="tbl"><thead><tr><th>Part</th><th style="text-align:right">Qty</th><th style="text-align:right">Shop</th></tr></thead><tbody id="p-rows"></tbody></table>
+    <div class="btns"><button class="btn ic" id="p-copy" type="button">Copy list</button></div>
+    <p class="note" id="p-note"></p>
+  </div>
+</dialog>
 <div class="toast" id="toast" hidden></div>
+
+<script>
+/* ===== Servo Bench settings: edit these =====
+   Donation buttons appear only for the services you fill in. Leave '' to hide one. */
+window.SERVO_BENCH = {
+  github: 'Python736/servo-bench',   // GitHub "owner/repo"
+  site: 'https://python736.github.io/servo-bench/',
+  donate: {
+    buymeacoffee: '',   // buymeacoffee.com/<username>
+    kofi: '',           // ko-fi.com/<username>
+    paypal: '',         // paypal.me/<username>
+    githubSponsors: '', // github.com/sponsors/<username> (after GitHub approves your Sponsors profile)
+    patreon: '',        // patreon.com/<username>
+  },
+  amazonTag: '',        // Amazon Associates tag, e.g. 'yourname-20'. Adds it to the parts-list shop links.
+};
+</script>
 
 <script type="importmap">
 {
@@ -1458,7 +1560,7 @@ $('#t-view').addEventListener('click', resetView);
 $('#t-rt').addEventListener('click', toggleRayTracing);
 $('#t-clear').addEventListener('click', () => { Object.keys(trails).forEach(clearTrail); poseDirty = true; toast('Cleared paths'); });
 document.addEventListener('keydown', e => {
-  if (e.target.closest('input, textarea, select') || e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.target.closest('input, textarea, select') || e.ctrlKey || e.metaKey || e.altKey || document.querySelector('dialog[open]')) return;
   const k = e.key.toLowerCase(), s = byId(S.sel), step = e.shiftKey ? 1 : 5;
   const moves = { arrowleft: [0, -step], arrowright: [0, step], arrowup: [2, -step], arrowdown: [2, step], pageup: [1, step], pagedown: [1, -step] };
   if (moves[k]) { if (!s) return; nudge(s, moves[k][0], moves[k][1]); }
@@ -1519,6 +1621,7 @@ $('#c-yes').addEventListener('click', () => {
 });
 function replaceBuild(next) {
   Object.keys(trails).forEach(clearTrail); rt = {}; S = next;
+  play = null; EX.steps = []; saveEx(); renderSteps(); // steps belong to the old build
   $('#g-real').checked = S.realistic; rebuild(); renderList(); renderInspector(); syncToolbar(); resetView();
 }
 $('#b-copy').addEventListener('click', () => {
@@ -1533,6 +1636,244 @@ $('#b-load').addEventListener('click', () => {
 });
 let toastTimer;
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 2800); }
+
+// ---------- dialogs ----------
+const CFG = window.SERVO_BENCH || {};
+document.querySelectorAll('dialog.modal').forEach(d => {
+  d.addEventListener('click', e => { if (e.target === d || e.target.closest('[data-close]')) d.close(); });
+});
+function copyText(txt, okMsg) {
+  const fallback = () => toast('Copying was blocked by the browser');
+  try { navigator.clipboard.writeText(txt).then(() => toast(okMsg), fallback); } catch (err) { fallback(); }
+}
+
+// ---------- support / donations ----------
+const DONATE = {
+  buymeacoffee:   { label: 'Buy Me a Coffee', sub: 'One-off or monthly', url: u => `https://buymeacoffee.com/${u}`, c: '#ffdd00', ink: true },
+  kofi:           { label: 'Ko-fi',           sub: 'Buy a coffee, no fees', url: u => `https://ko-fi.com/${u}`, c: '#1f9bd7' },
+  paypal:         { label: 'PayPal',          sub: 'Any amount', url: u => `https://paypal.me/${u}`, c: '#0b62b3' },
+  githubSponsors: { label: 'GitHub Sponsors', sub: 'Monthly support', url: u => `https://github.com/sponsors/${u}`, c: '#b73780' },
+  patreon:        { label: 'Patreon',         sub: 'Become a patron', url: u => `https://www.patreon.com/${u}`, c: '#e8533a' },
+};
+const repoUrl = CFG.github ? `https://github.com/${CFG.github}` : '';
+(function setupSupport() {
+  const d = CFG.donate || {}, box = $('#donate');
+  box.innerHTML = Object.entries(DONATE).filter(([k]) => d[k] && String(d[k]).trim())
+    .map(([k, v]) => `<a href="${esc(v.url(encodeURIComponent(String(d[k]).trim())))}" target="_blank" rel="noopener" style="--c:${v.c}"${v.ink ? ' class="dark-ink"' : ''}>${v.label}<small>${v.sub}</small></a>`).join('');
+  $('#donate-wrap').hidden = !box.children.length;
+  for (const [sel, url] of [['#gh-link', repoUrl], ['#sup-star', repoUrl], ['#sup-issue', repoUrl && repoUrl + '/issues/new']]) {
+    const a = $(sel); if (url) a.href = url; else a.hidden = true;
+  }
+})();
+const openSupport = () => $('#dlg-support').showModal();
+$('#t-support').addEventListener('click', openSupport);
+$('#b-support2').addEventListener('click', openSupport);
+$('#sup-share').addEventListener('click', () => copyText(CFG.site || location.href, 'Link copied · thanks for sharing!'));
+
+// ---------- motion steps + playback ----------
+const EX_STORE = 'servo-bench-export';
+let EX = { steps: [], board: 'uno', pins: {}, hold: 500 };
+try { const raw = localStorage.getItem(EX_STORE); if (raw) { const o = JSON.parse(raw); if (o && typeof o === 'object') EX = Object.assign(EX, o); } } catch (e) { /* storage unavailable */ }
+if (!Array.isArray(EX.steps)) EX.steps = [];
+if (!EX.pins || typeof EX.pins !== 'object') EX.pins = {};
+const saveEx = () => { try { localStorage.setItem(EX_STORE, JSON.stringify(EX)); } catch (e) { /* storage unavailable */ } };
+let play = null; // { i, holdUntil }
+const liveSteps = () => EX.steps.map(st => S.servos.filter(s => typeof st[s.id] === 'number').length ? st : null).filter(Boolean);
+
+function renderSteps() {
+  const box = $('#steps'), steps = EX.steps;
+  $('#steps-count').textContent = steps.length ? `${steps.length} step${steps.length > 1 ? 's' : ''}` : '';
+  box.innerHTML = steps.length ? steps.map((st, i) => {
+    const txt = S.servos.filter(s => typeof st[s.id] === 'number').map(s => `${s.name} ${st[s.id]}°`).join(' · ') || 'servos removed';
+    return `<div class="step${play && play.i === i ? ' on' : ''}" data-i="${i}" title="Click to move to this pose"><b>${i + 1}</b><span>${esc(txt)}</span><button class="x" type="button" data-del="${i}" aria-label="Delete step ${i + 1}">×</button></div>`;
+  }).join('') : '<p class="empty" style="font-size:13px">No steps yet.</p>';
+  const pb = $('#b-play'); pb.querySelector('span').textContent = play ? 'Stop' : 'Play'; pb.disabled = !play && steps.length < 2;
+  pb.querySelector('svg').innerHTML = play ? '<rect x="6" y="6" width="12" height="12" rx="1.5"/>' : '<path d="M7 5l12 7-12 7z"/>';
+}
+function goStep(st) {
+  for (const s of S.servos) {
+    if (typeof st[s.id] !== 'number') continue;
+    s.sweep = false; s.angle = clamp(st[s.id], s.min, s.max);
+    const r = rt[s.id]; if (r && !S.realistic) r.cur = s.angle;
+    const rng = document.getElementById('ang-' + s.id); if (rng) { rng.value = s.angle; paint(rng); }
+  }
+  poseDirty = true; dirty = true; renderInspector();
+}
+function stopPlay() { if (play) { play = null; renderSteps(); } }
+$('#b-step').addEventListener('click', () => {
+  if (!S.servos.length) { toast('Add a servo first'); return; }
+  const st = {}; S.servos.forEach(s => { st[s.id] = Math.round(s.sweep ? rt[s.id].cur : s.angle); });
+  EX.steps.push(st); saveEx(); renderSteps(); toast(`Saved step ${EX.steps.length}`);
+});
+$('#b-play').addEventListener('click', () => {
+  if (play) { stopPlay(); return; }
+  if (EX.steps.length < 2) return;
+  play = { i: 0, holdUntil: null }; goStep(EX.steps[0]); renderSteps();
+});
+$('#steps').addEventListener('click', e => {
+  const del = e.target.closest('[data-del]');
+  if (del) { stopPlay(); EX.steps.splice(+del.dataset.del, 1); saveEx(); renderSteps(); return; }
+  const row = e.target.closest('.step'); if (!row) return;
+  stopPlay(); goStep(EX.steps[+row.dataset.i]);
+});
+function tickPlay(now) {
+  if (!play) return;
+  const st = EX.steps[play.i] || {};
+  const moving = S.servos.some(s => typeof st[s.id] === 'number' && rt[s.id] && Math.abs(rt[s.id].cur - s.angle) > 1e-3);
+  if (moving) { play.holdUntil = null; return; }
+  if (play.holdUntil == null) { play.holdUntil = now + Math.max(400, EX.hold); return; }
+  if (now < play.holdUntil) return;
+  if (EX.steps.length < 2) { stopPlay(); return; }
+  play.i = (play.i + 1) % EX.steps.length; play.holdUntil = null;
+  goStep(EX.steps[play.i]); renderSteps();
+}
+
+// ---------- Arduino code ----------
+const BOARDS = {
+  uno:   { name: 'Arduino Uno / Nano / Mega', lib: 'Servo.h', pins: [9, 10, 11, 6, 5, 3, 2, 4, 7, 8, 12, 13], libNote: 'Uses the built-in Servo library: no install needed.' },
+  esp32: { name: 'ESP32', lib: 'ESP32Servo.h', pins: [13, 12, 14, 27, 26, 25, 33, 32, 15, 4, 16, 17, 18, 19, 21, 22], libNote: 'Install "ESP32Servo" by Kevin Harrington from the Arduino Library Manager first.' },
+};
+const PULSE = { sg90: [500, 2400], mg90s: [500, 2400], mg996r: [500, 2500] };
+const AMPS = { sg90: 0.5, mg90s: 0.6, mg996r: 1.5 };
+function exportSteps() {
+  const list = S.servos;
+  let steps = liveSteps().map(st => list.map(s => clamp(Math.round(typeof st[s.id] === 'number' ? st[s.id] : s.angle), s.min, s.max)));
+  if (!steps.length) {
+    const base = list.map(s => Math.round(s.sweep ? (s.min + s.max) / 2 : s.angle));
+    if (list.some(s => s.sweep)) steps = [list.map((s, i) => s.sweep ? s.min : base[i]), list.map((s, i) => s.sweep ? s.max : base[i])];
+    else steps = [base];
+  }
+  // Time to reach each step from the previous one (wrapping), from each servo's rated speed (s per 60°)
+  const ms = steps.map((st, k) => {
+    const prev = steps[(k - 1 + steps.length) % steps.length];
+    return Math.max(200, Math.round(Math.max(0, ...list.map((s, i) => Math.abs(st[i] - prev[i]) * TYPES[s.type].speed / 60 * 1000))));
+  });
+  return { steps, ms };
+}
+function pinFor(s, i) {
+  const b = BOARDS[EX.board] || BOARDS.uno, p = EX.pins[EX.board + ':' + s.id];
+  return b.pins.includes(p) ? p : b.pins[i % b.pins.length];
+}
+function buildSketch() {
+  const b = BOARDS[EX.board] || BOARDS.uno, list = S.servos, n = list.length;
+  if (!n) return '// Add at least one servo to generate code.';
+  const { steps, ms } = exportSteps();
+  const pins = list.map(pinFor), pad = (a, w = 4) => a.map(v => String(v).padStart(w)).join(',');
+  const names = list.map(s => s.name.replace(/[^\x20-\x7e]/g, '').slice(0, 14));
+  const L = [];
+  L.push(`// ${n} servo${n > 1 ? 's' : ''} · ${steps.length} step${steps.length > 1 ? 's' : ''} · made with Servo Bench`);
+  if (CFG.site) L.push(`// ${CFG.site}`);
+  L.push('//', '// Servo order: ' + names.map((x, i) => `${i + 1}=${x} (${TYPES[list[i].type].label})`).join(', '));
+  L.push('// Power servos from a separate 5-6 V supply and join its GND to the board GND.', '');
+  L.push(`#include <${b.lib}>`, '');
+  L.push(`const int SERVO_COUNT = ${n};`);
+  L.push(`const int PINS[SERVO_COUNT]   = {${pad(pins)} };`);
+  L.push(`const int MIN_US[SERVO_COUNT] = {${pad(list.map(s => PULSE[s.type][0]))} };  // pulse width at 0 deg`);
+  L.push(`const int MAX_US[SERVO_COUNT] = {${pad(list.map(s => PULSE[s.type][1]))} };  // pulse width at 180 deg`, '');
+  L.push(`// Each step is one pose: an angle (0-180) per servo, in the order above.`);
+  L.push(`const int STEP_COUNT = ${steps.length};`);
+  L.push(`const int STEPS[STEP_COUNT][SERVO_COUNT] = {`);
+  steps.forEach((st, k) => L.push(`  {${pad(st)} },  // step ${k + 1}`));
+  L.push('};');
+  L.push(`// Time to move into each step (ms), from the servos' rated speed.`);
+  L.push(`const unsigned int MOVE_MS[STEP_COUNT] = {${pad(ms, 5)} };`);
+  L.push(`const unsigned int HOLD_MS = ${EX.hold};  // pause after each step`, '');
+  L.push('Servo servo[SERVO_COUNT];', 'float pos[SERVO_COUNT];', '');
+  L.push('// Move every servo together so they all arrive at the same moment.');
+  L.push('void moveTo(const int target[], unsigned int ms) {');
+  L.push('  float start[SERVO_COUNT];');
+  L.push('  for (int i = 0; i < SERVO_COUNT; i++) start[i] = pos[i];');
+  L.push('  unsigned long t0 = millis();');
+  L.push('  while (true) {');
+  L.push('    float k = ms ? (millis() - t0) / (float)ms : 1.0;');
+  L.push('    if (k > 1.0) k = 1.0;');
+  L.push('    for (int i = 0; i < SERVO_COUNT; i++) {');
+  L.push('      pos[i] = start[i] + (target[i] - start[i]) * k;');
+  L.push('      servo[i].write((int)(pos[i] + 0.5));');
+  L.push('    }');
+  L.push('    if (k >= 1.0) break;');
+  L.push('    delay(15);');
+  L.push('  }');
+  L.push('}', '');
+  L.push('void setup() {');
+  L.push('  for (int i = 0; i < SERVO_COUNT; i++) {');
+  if (EX.board === 'esp32') L.push('    servo[i].setPeriodHertz(50);');
+  L.push('    servo[i].attach(PINS[i], MIN_US[i], MAX_US[i]);');
+  L.push('    pos[i] = STEPS[0][i];');
+  L.push('    servo[i].write(STEPS[0][i]);');
+  L.push('  }');
+  L.push('  delay(1000);');
+  L.push('}', '');
+  L.push('void loop() {');
+  if (steps.length > 1) {
+    L.push('  for (int s = 0; s < STEP_COUNT; s++) {');
+    L.push('    moveTo(STEPS[s], MOVE_MS[s]);');
+    L.push('    delay(HOLD_MS);');
+    L.push('  }');
+  } else L.push('  // Only one pose: the servos just hold it. Save more steps in Servo Bench to animate.');
+  L.push('}');
+  return L.join('\n');
+}
+function renderCode() {
+  const b = BOARDS[EX.board] || BOARDS.uno, list = S.servos;
+  $('#c-board').value = EX.board in BOARDS ? EX.board : 'uno';
+  $('#c-hold').value = String(EX.hold);
+  $('#c-pins').innerHTML = list.length ? list.map((s, i) => {
+    const p = pinFor(s, i);
+    return `<tr><td><span class="sw" style="--c:${hex(s.color)};display:inline-block;vertical-align:-1px;margin-right:8px"></span>${esc(s.name)} <span class="chip">${TYPES[s.type].label}</span></td><td style="text-align:right"><select data-pin="${s.id}" aria-label="Pin for ${esc(s.name)}">${b.pins.map(x => `<option${x === p ? ' selected' : ''}>${x}</option>`).join('')}</select></td></tr>`;
+  }).join('') : '<tr><td class="empty">No servos in the build.</td></tr>';
+  const pins = list.map(pinFor), dup = pins.some((p, i) => pins.indexOf(p) !== i);
+  const amps = list.reduce((a, s) => a + AMPS[s.type], 0), warn = [];
+  if (dup) warn.push('Two servos share a pin. Give each servo its own pin.');
+  if (list.length > b.pins.length) warn.push(`This board drives up to ${b.pins.length} servos directly. Use a PCA9685 servo driver for more.`);
+  if (list.length > 1 || list.some(s => s.type === 'mg996r')) warn.push(`Don't power the servos from the board's 5V pin. Use a 5–6 V supply rated at least ${Math.max(2, Math.ceil(amps))} A.`);
+  $('#c-warn').hidden = !warn.length; $('#c-warn').textContent = warn.join(' ');
+  $('#c-out').textContent = buildSketch();
+  $('#c-lib').textContent = b.libNote + (liveSteps().length ? '' : ' Tip: save motion steps to make the code animate your build.');
+}
+$('#b-code').addEventListener('click', () => { renderCode(); $('#dlg-code').showModal(); });
+$('#c-board').addEventListener('change', e => { EX.board = e.target.value; saveEx(); renderCode(); });
+$('#c-hold').addEventListener('change', e => { EX.hold = +e.target.value; saveEx(); renderCode(); });
+$('#c-pins').addEventListener('change', e => { const id = e.target.dataset.pin; if (!id) return; EX.pins[EX.board + ':' + id] = +e.target.value; saveEx(); renderCode(); });
+$('#c-copy').addEventListener('click', () => copyText(buildSketch(), 'Code copied · paste it into the Arduino IDE'));
+$('#c-dl').addEventListener('click', () => {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([buildSketch()], { type: 'text/plain' }));
+  a.download = 'servo_bench.ino'; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+
+// ---------- parts list ----------
+function shopLinks(q) {
+  const tag = CFG.amazonTag ? `&tag=${encodeURIComponent(CFG.amazonTag)}` : '';
+  return `<a href="https://www.amazon.com/s?k=${encodeURIComponent(q)}${tag}" target="_blank" rel="noopener sponsored">Amazon</a><a href="https://www.aliexpress.com/w/wholesale-${encodeURIComponent(q.replace(/\s+/g, '-'))}.html" target="_blank" rel="noopener sponsored">AliExpress</a>`;
+}
+function partsRows() {
+  const list = S.servos, rows = [], count = f => list.filter(f).length;
+  const NAMES = { sg90: ['SG90 micro servo (plastic gears)', 'SG90 servo'], mg90s: ['MG90S micro servo (metal gears)', 'MG90S servo'], mg996r: ['MG996R servo (metal gears)', 'MG996R servo'] };
+  for (const t of Object.keys(TYPES)) { const n = count(s => s.type === t); if (n) rows.push([NAMES[t][0], n, NAMES[t][1]]); }
+  const LINKQ = { alu: ['Aluminium servo arm / flat bar', 'aluminum servo arm'], print: ['3D-printed link (print it yourself)', ''], stick: ['Wooden craft sticks', 'wooden craft sticks'] };
+  for (const k of Object.keys(LINKS)) { const n = count(s => hasLink(s) && s.link === k); if (n) rows.push([`${LINKQ[k][0]}, ${n > 1 ? 'up to ' : ''}${Math.max(...list.filter(s => hasLink(s) && s.link === k).map(s => s.arm))} mm`, n, LINKQ[k][1]]); }
+  const micro = count(s => s.parent && s.type !== 'mg996r'), big = count(s => s.parent && s.type === 'mg996r');
+  if (micro) rows.push(['Micro servo mounting bracket', micro, 'SG90 servo bracket']);
+  if (big) rows.push(['MG996R servo bracket', big, 'MG996R servo bracket']);
+  if (list.length) {
+    const b = EX.board === 'esp32' ? ['ESP32 dev board', 'ESP32 development board'] : ['Arduino Uno (or Nano)', 'Arduino Uno R3'];
+    rows.push([b[0], 1, b[1]]);
+    const amps = Math.max(2, Math.ceil(list.reduce((a, s) => a + AMPS[s.type], 0)));
+    rows.push([`5 V power supply, ${amps} A or more`, 1, `5V ${amps}A power supply`]);
+    if (list.length > 8) rows.push(['PCA9685 16-channel servo driver (recommended)', 1, 'PCA9685 servo driver']);
+    rows.push(['Breadboard + jumper wires', 1, 'breadboard jumper wires kit']);
+  }
+  return rows;
+}
+function renderParts() {
+  const rows = partsRows();
+  $('#p-rows').innerHTML = rows.length ? rows.map(([name, n, q]) => `<tr><td>${esc(name)}</td><td class="n">${n}</td><td class="shop">${q ? shopLinks(q) : ''}</td></tr>`).join('') : '<tr><td colspan="3" class="empty">Add servos to see what to buy.</td></tr>';
+  $('#p-note').textContent = 'Servos come with horns and screws. Shop links search for each part' + (CFG.amazonTag ? ' and support this project at no extra cost to you.' : '.');
+}
+$('#b-parts').addEventListener('click', () => { renderParts(); $('#dlg-parts').showModal(); });
+$('#p-copy').addEventListener('click', () => copyText(partsRows().map(([name, n]) => `${n} × ${name}`).join('\n'), 'Parts list copied'));
 
 // ---------- main loop ----------
 let last = performance.now();
@@ -1550,6 +1891,7 @@ function tick(now) {
     const d = s.angle - r.cur;
     if (d !== 0) { const step = rate * dt; r.cur = Math.abs(d) <= step ? s.angle : r.cur + Math.sign(d) * step; moved = true; }
   }
+  tickPlay(now);
   let changed = false;
   if (moved || poseDirty) { updatePose(); poseDirty = false; changed = 'scene'; renderer.shadowMap.needsUpdate = true; }
   updateHover();
@@ -1566,7 +1908,7 @@ setInterval(() => { if (dirty) { save(); dirty = false; } }, 800);
 S = load() || Object.assign(fromPreset('start'), { realistic: true, rt: false });
 $('#g-real').checked = S.realistic;
 syncRtButton(); if (S.rt) loadPathTracer();
-rebuild(); renderList(); renderInspector(); syncToolbar(); resetView();
+rebuild(); renderList(); renderInspector(); syncToolbar(); resetView(); renderSteps();
 requestAnimationFrame(tick);
 })();
 </script>
