@@ -650,7 +650,7 @@ catch (err) {
 // If the graphics driver drops the view, say so and let three.js restore it.
 canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); gfxMessage('3D view paused', 'The graphics driver reset. It usually comes back in a moment. If not, reload the page.'); });
 canvas.addEventListener('webglcontextrestored', () => { $('#gfx-msg').hidden = true; rebuild(); stale = true; });
-renderer.setPixelRatio(Math.min(LOW ? 1 : 1.5, window.devicePixelRatio || 1));
+renderer.setPixelRatio(Math.min(LOW ? 1.25 : 1.5, window.devicePixelRatio || 1));
 renderer.setClearColor(0x000000, 0);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 0.95;
@@ -666,6 +666,38 @@ let camMoved = true, camFrame = false, redraw = true;
 controls.addEventListener('change', () => { camMoved = true; camFrame = true; });
 controls.enableDamping = true; controls.dampingFactor = 0.1; controls.maxPolarAngle = Math.PI * 0.48;
 controls.minDistance = 40; controls.maxDistance = 1600; controls.zoomSpeed = 0.9; controls.rotateSpeed = 0.7;
+
+// Smooth wheel zoom toward the point under the mouse (like a map). The wheel is caught before
+// OrbitControls sees it; pinch-zoom on touch screens still goes through OrbitControls.
+const ZOOM = { active: false, goal: 0, P: new V3() };
+{
+  const plane = new THREE.Plane(), ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), up = new V3(0, 1, 0);
+  stage.addEventListener('wheel', e => {
+    if (e.target !== canvas) return;
+    e.preventDefault(); e.stopPropagation();
+    if (RENDER.active) return;
+    const dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaMode === 2 ? e.deltaY * 400 : e.deltaY;
+    const cur = camera.position.distanceTo(controls.target);
+    ZOOM.goal = clamp((ZOOM.active ? ZOOM.goal : cur) * Math.exp(clamp(dy, -240, 240) * 0.0016), controls.minDistance, controls.maxDistance);
+    const r = canvas.getBoundingClientRect();
+    ndc.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1);
+    ray.setFromCamera(ndc, camera);
+    plane.setFromNormalAndCoplanarPoint(up, controls.target);
+    if (!ray.ray.intersectPlane(plane, ZOOM.P) || ZOOM.P.distanceTo(controls.target) > 900) ZOOM.P.copy(controls.target);
+    ZOOM.active = true;
+  }, { capture: true, passive: false });
+}
+const _zv = new V3();
+function stepZoom(dt) {
+  if (!ZOOM.active) return;
+  const cur = camera.position.distanceTo(controls.target);
+  let next = cur + (ZOOM.goal - cur) * (1 - Math.exp(-dt * 14));
+  if (Math.abs(ZOOM.goal - next) < cur * 0.002) { next = ZOOM.goal; ZOOM.active = false; }
+  const k = next / cur; // scale camera and target about the point under the mouse
+  camera.position.sub(ZOOM.P).multiplyScalar(k).add(ZOOM.P);
+  controls.target.sub(ZOOM.P).multiplyScalar(k).add(ZOOM.P);
+  _zv.copy(controls.target); controls.target.x = clamp(_zv.x, -700, 700); controls.target.z = clamp(_zv.z, -700, 700);
+}
 
 // Soft studio reflections: a small room with light panels, prefiltered into an environment map.
 let ENV = null;
@@ -695,10 +727,11 @@ const rim = new THREE.DirectionalLight(0xdfe8ff, 1.4); rim.position.set(-260, 16
 // as soon as everything is still, one frame is drawn at full sharpness.
 // Resolution only changes in fixed steps with a cooldown: every change re-allocates the drawing buffer,
 // so it must never happen every frame. Drawing is capped at 60 fps (high-refresh screens don't need more for this).
+// One steady resolution normally (no switching, so no re-allocations or sharpness pops). Only if frames are
+// really slow during a long movement does it step down, and it returns to full sharpness once things are still.
 const DPR_DEV = window.devicePixelRatio || 1;
-const DPR_SHARP = Math.min(1.5, DPR_DEV);                 // used for still frames
-const DPR_MOVE = Math.min(LOW ? 1 : 1.5, DPR_DEV);       // best resolution while things move
-const DPR_STEPS = [1, 0.85, 0.72, 0.6].map(k => Math.round(DPR_MOVE * k * 100) / 100);
+const DPR_BASE = Math.min(LOW ? 1.25 : 1.5, DPR_DEV);
+const DPR_STEPS = [1, 0.85, 0.72, 0.6].map(k => Math.round(DPR_BASE * k * 100) / 100);
 const DYN = { level: 0, ema: 0, slowFor: 0, fastFor: 0, cool: 0, lastDraw: -1e9, lastChange: -1e9 };
 let stale = true;
 function renderRaster() { renderer.render(scene, camera); }
@@ -716,13 +749,13 @@ function renderFrame(now, changed) {
       DYN.slowFor = DYN.ema > 30 ? DYN.slowFor + 1 : 0;      // under ~33 fps
       DYN.fastFor = DYN.ema < 19 ? DYN.fastFor + 1 : 0;      // holding ~60 fps
       if (now > DYN.cool) {
-        if (DYN.slowFor >= 8 && DYN.level < DPR_STEPS.length - 1) { DYN.level++; DYN.cool = now + 700; DYN.slowFor = 0; DYN.ema = 0; }
+        if (DYN.slowFor >= 10 && DYN.level < DPR_STEPS.length - 1) { DYN.level++; DYN.cool = now + 800; DYN.slowFor = 0; DYN.ema = 0; }
         else if (DYN.fastFor >= 180 && DYN.level > 0) { DYN.level--; DYN.cool = now + 2500; DYN.fastFor = 0; }
       }
+      if (DYN.level > 0) setDpr(DPR_STEPS[DYN.level]); // reduced only during sustained motion
     }
-    setDpr(DPR_STEPS[DYN.level]);
-  } else if (!stale && now - DYN.lastChange > 300 && Math.abs(renderer.getPixelRatio() - DPR_SHARP) > 0.01) {
-    setDpr(DPR_SHARP); stale = true; // everything is still: one sharp frame
+  } else if (!stale && now - DYN.lastChange > 300 && Math.abs(renderer.getPixelRatio() - DPR_BASE) > 0.01) {
+    setDpr(DPR_BASE); stale = true; // everything is still: back to full sharpness
   }
   if (!stale) return;
   renderRaster(); renderOverlay(); stale = false; DYN.lastDraw = now;
@@ -776,7 +809,7 @@ async function startRender() {
     RENDER.phase = 'scene'; renderUi('Building the scene…', 0);
     await new Promise(r => setTimeout(r, 30)); // let the status paint before the heavy step
     if (!RENDER.active) return;
-    setDpr(DPR_SHARP);
+    setDpr(DPR_BASE);
     t.tiles.set(2, 2);
     t.renderScale = Math.min(1, 1 / renderer.getPixelRatio()); // trace at screen resolution, not device pixels
     t.pausePathTracing = false;
@@ -1973,7 +2006,7 @@ function tick(now) {
   updateHover();
   updateGizmo();
   updateReadouts(now);
-  camFrame = false; controls.update();
+  camFrame = false; stepZoom(dt); controls.update();
   if (!changed && camFrame) changed = 'camera';
   if (!changed && redraw) changed = 'overlay';
   redraw = false;
