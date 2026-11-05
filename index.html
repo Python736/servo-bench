@@ -624,6 +624,23 @@ function gfxMessage(title, body) {
   const m = $('#gfx-msg'); m.hidden = false;
   m.querySelector('b').textContent = title; m.querySelector('span').textContent = body;
 }
+// Graphics tier: built-in / mobile chips get cheaper shadows, materials and resolution.
+// The app still looks the same from a normal distance; it just never asks a small chip for more than it can do.
+const TIER = (() => {
+  if (/[?&]quality=high\b/.test(location.search)) return 'high';
+  if (/[?&]quality=low\b/.test(location.search)) return 'low';
+  try {
+    const c = document.createElement('canvas'), gl = c.getContext('webgl2') || c.getContext('webgl');
+    if (!gl) return 'low';
+    const ext = gl.getExtension('WEBGL_debug_renderer_info');
+    const name = String(gl.getParameter(ext ? ext.UNMASKED_RENDERER_WEBGL : gl.RENDERER));
+    const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext();
+    if (/(RTX|GTX|Quadro|Radeon RX|Radeon Pro|Arc\(TM\) A|Arc A\d)/i.test(name)) return 'high';
+    if (/(Intel|UHD|Iris|Radeon\(TM\)|Radeon Graphics|Vega|\d{3}M\b|Mali|Adreno|PowerVR|Apple|SwiftShader|llvmpipe|Basic Render|Microsoft)/i.test(name)) return 'low';
+    return 'high';
+  } catch (e) { return 'low'; }
+})();
+const LOW = TIER === 'low';
 let renderer;
 try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' }); }
 catch (err) {
@@ -633,12 +650,12 @@ catch (err) {
 // If the graphics driver drops the view, say so and let three.js restore it.
 canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); gfxMessage('3D view paused', 'The graphics driver reset. It usually comes back in a moment. If not, reload the page.'); });
 canvas.addEventListener('webglcontextrestored', () => { $('#gfx-msg').hidden = true; rebuild(); stale = true; });
-renderer.setPixelRatio(Math.min(1.75, window.devicePixelRatio || 1));
+renderer.setPixelRatio(Math.min(LOW ? 1 : 1.5, window.devicePixelRatio || 1));
 renderer.setClearColor(0x000000, 0);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 0.95;
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.type = LOW ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
 renderer.shadowMap.autoUpdate = false; // shadows don't depend on the camera: re-render them only when the scene changes
 renderer.shadowMap.needsUpdate = true;
 const scene = new THREE.Scene();
@@ -666,7 +683,8 @@ let ENV = null;
 })();
 const hemi = new THREE.HemisphereLight(0xffffff, 0x3a3226, 1.1); scene.add(hemi);
 const sun = new THREE.DirectionalLight(0xfff4e6, 5);
-sun.position.set(180, 420, 240); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+sun.position.set(180, 420, 240); sun.castShadow = true; sun.shadow.mapSize.set(LOW ? 1024 : 2048, LOW ? 1024 : 2048);
+if (LOW) sun.shadow.radius = 2;
 Object.assign(sun.shadow.camera, { left: -360, right: 360, top: 360, bottom: -360, near: 50, far: 1200 });
 sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.4; scene.add(sun);
 const rim = new THREE.DirectionalLight(0xdfe8ff, 1.4); rim.position.set(-260, 160, -220); scene.add(rim);
@@ -675,24 +693,36 @@ const rim = new THREE.DirectionalLight(0xdfe8ff, 1.4); rim.position.set(-260, 16
 // The page draws only when something changed, so an idle bench costs nothing.
 // While things move on a slow graphics chip, frames are drawn at a lower resolution to stay smooth;
 // as soon as everything is still, one frame is drawn at full sharpness.
-const DPR_MAX = Math.min(1.75, window.devicePixelRatio || 1), DPR_MIN = Math.min(DPR_MAX, 0.7);
-const DYN = { scale: DPR_MAX, ema: 0, lastDraw: -1e9, lastChange: 0 };
+// Resolution only changes in fixed steps with a cooldown: every change re-allocates the drawing buffer,
+// so it must never happen every frame. Drawing is capped at 60 fps (high-refresh screens don't need more for this).
+const DPR_DEV = window.devicePixelRatio || 1;
+const DPR_SHARP = Math.min(1.5, DPR_DEV);                 // used for still frames
+const DPR_MOVE = Math.min(LOW ? 1 : 1.5, DPR_DEV);       // best resolution while things move
+const DPR_STEPS = [1, 0.85, 0.72, 0.6].map(k => Math.round(DPR_MOVE * k * 100) / 100);
+const DYN = { level: 0, ema: 0, slowFor: 0, fastFor: 0, cool: 0, lastDraw: -1e9, lastChange: -1e9 };
 let stale = true;
 function renderRaster() { renderer.render(scene, camera); }
 function renderOverlay() { renderer.autoClear = false; renderer.clearDepth(); renderer.render(overlay, camera); renderer.autoClear = true; }
 function setDpr(r) { if (Math.abs(renderer.getPixelRatio() - r) > 0.01) renderer.setPixelRatio(r); }
 function renderFrame(now, changed) {
   if (changed) {
-    stale = true; DYN.lastChange = now;
+    stale = true;
+    const moving = now - DYN.lastChange < 250; // part of an ongoing gesture or animation
+    DYN.lastChange = now;
+    if (now - DYN.lastDraw < 15) return;     // 60 fps cap: draw on a later frame
     const gap = now - DYN.lastDraw;
-    if (gap < 60) { // continuous motion: judge the frame time
-      DYN.ema = DYN.ema ? DYN.ema * 0.85 + gap * 0.15 : gap;
-      if (DYN.ema > 24 && DYN.scale > DPR_MIN) { DYN.scale = Math.max(DPR_MIN, DYN.scale * 0.85); DYN.ema = 0; }
-      else if (DYN.ema < 12 && DYN.scale < DPR_MAX) DYN.scale = Math.min(DPR_MAX, DYN.scale * 1.03);
+    if (moving && gap < 120) {
+      DYN.ema = DYN.ema ? DYN.ema * 0.8 + gap * 0.2 : gap;
+      DYN.slowFor = DYN.ema > 30 ? DYN.slowFor + 1 : 0;      // under ~33 fps
+      DYN.fastFor = DYN.ema < 19 ? DYN.fastFor + 1 : 0;      // holding ~60 fps
+      if (now > DYN.cool) {
+        if (DYN.slowFor >= 8 && DYN.level < DPR_STEPS.length - 1) { DYN.level++; DYN.cool = now + 700; DYN.slowFor = 0; DYN.ema = 0; }
+        else if (DYN.fastFor >= 180 && DYN.level > 0) { DYN.level--; DYN.cool = now + 2500; DYN.fastFor = 0; }
+      }
     }
-    setDpr(DYN.scale);
-  } else if (!stale && renderer.getPixelRatio() < DPR_MAX - 0.01 && now - DYN.lastChange > 180) {
-    setDpr(DPR_MAX); stale = true; // settled: one sharp frame
+    setDpr(DPR_STEPS[DYN.level]);
+  } else if (!stale && now - DYN.lastChange > 300 && Math.abs(renderer.getPixelRatio() - DPR_SHARP) > 0.01) {
+    setDpr(DPR_SHARP); stale = true; // everything is still: one sharp frame
   }
   if (!stale) return;
   renderRaster(); renderOverlay(); stale = false; DYN.lastDraw = now;
@@ -746,7 +776,7 @@ async function startRender() {
     RENDER.phase = 'scene'; renderUi('Building the scene…', 0);
     await new Promise(r => setTimeout(r, 30)); // let the status paint before the heavy step
     if (!RENDER.active) return;
-    setDpr(DPR_MAX);
+    setDpr(DPR_SHARP);
     t.tiles.set(2, 2);
     t.renderScale = Math.min(1, 1 / renderer.getPixelRatio()); // trace at screen resolution, not device pixels
     t.pausePathTracing = false;
@@ -803,7 +833,7 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) stal
 function canvasTex(w, h, draw, srgb = true) {
   const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h);
   const t = new THREE.CanvasTexture(c); t.colorSpace = srgb ? THREE.SRGBColorSpace : THREE.NoColorSpace;
-  t.anisotropy = renderer.capabilities.getMaxAnisotropy(); return t;
+  t.anisotropy = Math.min(LOW ? 4 : 8, renderer.capabilities.getMaxAnisotropy()); return t;
 }
 // Wooden bench top that fades out at the edges.
 const woodTex = canvasTex(1024, 1024, (g, w, h) => {
@@ -932,7 +962,9 @@ const linkMat = kind => sharedMat('link-' + kind, () => kind === 'alu'
 function stickTex() { const t = woodTex.clone(); t.needsUpdate = true; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(1 / 60, 1 / 160); t.rotation = Math.PI / 2; return t; }
 const WIRE_COLORS = [0x6b3d1f, 0xc8352a, 0xf0a020];
 
-function mesh(geo, mat, x = 0, y = 0, z = 0) { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true; return m; }
+// Servo parts cast shadows onto the mat. Shadows of servo parts onto each other are skipped on small chips:
+// they're barely visible but cost a shadow lookup on every servo pixel, which is what made close-ups so heavy.
+function mesh(geo, mat, x = 0, y = 0, z = 0, cast = true) { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = cast; m.receiveShadow = !LOW; return m; }
 const ACCENT_3D = 0xf08a3c;
 
 // ---------- shared, merged geometry ----------
@@ -1005,7 +1037,9 @@ const linkGeo = (type, t, kind, len) => sharedGeo(`link-${type}-${kind}-${len}`,
   const L = LINKS[kind]; return part(flat(linkShape(len, L.w, kind), L.th, kind === 'alu' ? 0.15 : 0.35), 0, hornY(t) + L.th, 0);
 });
 const tipGeo = () => sharedGeo('tip', () => merged([part(new THREE.TorusGeometry(2.4, 0.42, 10, 32).rotateX(Math.PI / 2)), part(new THREE.SphereGeometry(1.1, 16, 12))]));
-const shellMat = color => sharedMat('shell-' + color, () => new THREE.MeshPhysicalMaterial({ color: C(color), roughness: 0.4, metalness: 0, clearcoat: 0.4, clearcoatRoughness: 0.35 }));
+const shellMat = color => sharedMat('shell-' + color, () => LOW
+  ? new THREE.MeshStandardMaterial({ color: C(color), roughness: 0.36, metalness: 0 }) // one specular layer instead of two
+  : new THREE.MeshPhysicalMaterial({ color: C(color), roughness: 0.4, metalness: 0, clearcoat: 0.4, clearcoatRoughness: 0.35 }));
 const seamMat = color => sharedMat('seam-' + color, () => new THREE.MeshStandardMaterial({ color: C(color).multiplyScalar(0.45), roughness: 0.7 }));
 const labelMat = (type, color) => { const tex = labelTex(type, color); return sharedMat('label-' + tex.uuid, () => new THREE.MeshStandardMaterial({ map: tex, roughness: 0.55 })); };
 const wireMat = c => sharedMat('wire' + c, () => new THREE.MeshStandardMaterial({ color: C(c), roughness: 0.45 }));
@@ -1035,17 +1069,17 @@ function buildServo(s) {
   const body = new THREE.Group(), horn = new THREE.Group();
   [body, horn].forEach(g => { g.matrixAutoUpdate = false; g.userData.sid = s.id; });
   horn.userData.part = 'horn'; body.userData.part = 'body';
-  body.add(mesh(shellGeo(type, t), shellMat(s.color)), mesh(seamGeo(type, t), seamMat(s.color)), mesh(splineGeo(type, t), brass()));
-  const lab = new THREE.Mesh(labelGeo(type, t), labelMat(type, s.color)); lab.receiveShadow = true; body.add(lab);
+  body.add(mesh(shellGeo(type, t), shellMat(s.color)), mesh(seamGeo(type, t), seamMat(s.color)), mesh(splineGeo(type, t), brass(), 0, 0, 0, false));
+  const lab = new THREE.Mesh(labelGeo(type, t), labelMat(type, s.color)); lab.receiveShadow = !LOW; body.add(lab);
   WIRE_COLORS.forEach((c, i) => body.add(mesh(wireGeo(type, t, i), wireMat(c))));
   body.add(mesh(connGeo(type, t), connMat()));
   const outline = new THREE.LineSegments(outlineGeo(type, t), outlineMat()); outline.visible = false; body.add(outline);
 
   const hy = hornY(t);
-  horn.add(mesh(hornGeo(type, t, s.horn), nylon()), mesh(screwGeo('h' + type, 1.35, 0.7, hy + 0.35), steel()));
+  horn.add(mesh(hornGeo(type, t, s.horn), nylon()), mesh(screwGeo('h' + type, 1.35, 0.7, hy + 0.35), steel(), 0, 0, 0, false));
   if (hasLink(s)) {
     const th = LINKS[s.link].th;
-    horn.add(mesh(linkGeo(type, t, s.link, s.arm), linkMat(s.link)), mesh(screwGeo(`l${type}-${s.link}`, 1.4, 0.8, hy + th + 0.4), steel()));
+    horn.add(mesh(linkGeo(type, t, s.link, s.arm), linkMat(s.link)), mesh(screwGeo(`l${type}-${s.link}`, 1.4, 0.8, hy + th + 0.4), steel(), 0, 0, 0, false));
   }
   // Orange connection point at the arm end.
   const tip = new THREE.Mesh(tipGeo(), TIP_MAT); tip.position.set(0, outY(s) + 0.5, s.arm); horn.add(tip);
