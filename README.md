@@ -7,6 +7,7 @@
   <a href="https://python736.github.io/servo-bench/?example=arm3"><img src="https://img.shields.io/badge/Try%20the%20robot%20arm-2f63c4?style=for-the-badge" alt="Try the robot arm"></a>
   <a href="https://github.com/Python736/servo-bench/stargazers"><img src="https://img.shields.io/github/stars/Python736/servo-bench?style=for-the-badge&color=f2c94c&logo=github" alt="GitHub stars"></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/Python736/servo-bench?style=for-the-badge&color=2c8a56" alt="MIT license"></a>
+  <a href="https://buymeacoffee.com/python736"><img src="https://img.shields.io/badge/Buy%20me%20a%20coffee-ffdd00?style=for-the-badge&logo=buymeacoffee&logoColor=black" alt="Buy me a coffee"></a>
 </p>
 
 <p align="center">
@@ -164,7 +165,9 @@ Servo Bench is free, open source and ad-free. If it saved you time or a burnt-ou
 
 - ⭐ **Star this repo**. It really helps others find it.
 - 🔗 **Share it** with a friend or your maker community.
-- ☕ **Donate** with the ❤ **Support** button in the app.
+- ☕ **[Buy me a coffee](https://buymeacoffee.com/python736)**. Every coffee goes into new features.
+
+<a href="https://buymeacoffee.com/python736"><img src="https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20coffee&emoji=%E2%98%95&slug=python736&button_colour=FFDD00&font_colour=000000&font_family=Bree&outline_colour=000000&coffee_colour=ffffff" alt="Buy me a coffee" height="48"></a>
 
 <details>
 <summary>For maintainers: setting up donations</summary>
