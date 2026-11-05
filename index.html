@@ -25,7 +25,7 @@
   --track: #dce3df;
   --stage-1: #f6f7f5;
   --stage-2: #c9d2cd;
-  --glass: rgba(255, 255, 255, 0.8);
+  --glass: rgba(255, 255, 255, 0.93);
   --glass-line: rgba(20, 30, 25, 0.1);
   --shadow: 0 1px 2px rgba(16, 24, 20, 0.06), 0 10px 30px rgba(16, 24, 20, 0.1);
   --ok: #2c8a56;
@@ -38,7 +38,7 @@
   :root:not([data-theme="light"]) {
     --bg: #0b0f0d; --panel: #121815; --panel-2: #171f1b; --fg: #e5ebe7; --muted: #8e9c95; --faint: #66736d;
     --line: #232d28; --field: #0e1311; --accent: #f28a3e; --accent-ink: #1a0e04; --accent-soft: rgba(242, 138, 62, 0.15);
-    --track: #2a3530; --stage-1: #2a342f; --stage-2: #0a0e0c; --glass: rgba(18, 24, 21, 0.78); --glass-line: rgba(255, 255, 255, 0.08);
+    --track: #2a3530; --stage-1: #2a342f; --stage-2: #0a0e0c; --glass: rgba(18, 24, 21, 0.92); --glass-line: rgba(255, 255, 255, 0.08);
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 32px rgba(0, 0, 0, 0.35);
     --ok: #4cbf80; --warn: #e2ab3a; --crit: #ef6a55; color-scheme: dark;
   }
@@ -46,7 +46,7 @@
 :root[data-theme="dark"] {
   --bg: #0b0f0d; --panel: #121815; --panel-2: #171f1b; --fg: #e5ebe7; --muted: #8e9c95; --faint: #66736d;
   --line: #232d28; --field: #0e1311; --accent: #f28a3e; --accent-ink: #1a0e04; --accent-soft: rgba(242, 138, 62, 0.15);
-  --track: #2a3530; --stage-1: #2a342f; --stage-2: #0a0e0c; --glass: rgba(18, 24, 21, 0.78); --glass-line: rgba(255, 255, 255, 0.08);
+  --track: #2a3530; --stage-1: #2a342f; --stage-2: #0a0e0c; --glass: rgba(18, 24, 21, 0.92); --glass-line: rgba(255, 255, 255, 0.08);
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 32px rgba(0, 0, 0, 0.35);
   --ok: #4cbf80; --warn: #e2ab3a; --crit: #ef6a55; color-scheme: dark;
 }
@@ -72,7 +72,8 @@ body {
   box-shadow: var(--shadow); border: 1px solid var(--line);
 }
 #view { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
-.glass { background: var(--glass); border: 1px solid var(--glass-line); backdrop-filter: blur(14px) saturate(1.3); -webkit-backdrop-filter: blur(14px) saturate(1.3); box-shadow: var(--shadow); }
+/* No backdrop blur: blurring a live 3D view every frame is expensive on built-in graphics. */
+.glass { background: var(--glass); border: 1px solid var(--glass-line); box-shadow: var(--shadow); }
 .toolbar { position: absolute; top: 12px; left: 12px; right: 12px; display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-start; pointer-events: none; }
 .toolbar > * { pointer-events: auto; }
 .toolbar .spacer { flex: 1; pointer-events: none; }
@@ -114,7 +115,14 @@ body {
 
 .drop-tip { position: absolute; left: 50%; top: 66px; transform: translateX(-50%); padding: 7px 14px; border-radius: 999px; font-size: 14px; font-weight: 500; pointer-events: none; white-space: nowrap; max-width: calc(100% - 24px); overflow: hidden; text-overflow: ellipsis; }
 
-.rt-badge { position: absolute; right: 12px; top: 64px; padding: 5px 11px; border-radius: 999px; font: 500 12px var(--mono); font-variant-numeric: tabular-nums; pointer-events: none; }
+.render-block { position: absolute; inset: 0; cursor: progress; }
+.render { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); width: min(420px, calc(100% - 24px)); border-radius: 14px; padding: 14px 16px; display: grid; gap: 10px; }
+.r-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.r-head b { font-size: 16px; }
+.r-head select { width: auto; font-size: 13px; padding: 4px 6px; }
+.r-bar { height: 6px; border-radius: 3px; background: var(--track); overflow: hidden; }
+.r-bar i { display: block; height: 100%; width: 0; background: var(--accent); border-radius: 3px; transition: width 0.25s; }
+.r-status { margin: 0; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .gfx-msg { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(340px, calc(100% - 32px)); border-radius: 14px; padding: 18px; display: grid; gap: 8px; justify-items: start; font-size: 14px; color: var(--muted); }
 .gfx-msg b { font-size: 16px; color: var(--fg); }
 
@@ -281,7 +289,7 @@ pre.code { margin: 0; max-height: 300px; overflow: auto; background: var(--field
       </div>
       <span class="spacer"></span>
       <div class="tgroup glass">
-        <button class="tb" id="t-rt" type="button" aria-pressed="false" title="Path-traced lighting, like Blender Cycles. Refines while nothing moves (L)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg><span class="lbl-long">Ray tracing</span></button>
+        <button class="tb" id="t-rt" type="button" aria-pressed="false" title="Photo-real ray-traced render, like Blender Cycles (L)"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span class="lbl-long">Render</span></button>
         <span class="tsep"></span>
         <button class="tb" id="t-clear" type="button" title="Clear drawn paths"><svg viewBox="0 0 24 24"><path d="M3 17c3-6 6 2 9-4s6 0 9-6"/><path d="M4 21L20 5"/></svg><span class="lbl-long">Clear paths</span></button>
         <button class="tb" id="t-view" type="button" title="Frame the whole build"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span class="lbl-long">Fit view</span></button>
@@ -317,7 +325,15 @@ pre.code { margin: 0; max-height: 300px; overflow: auto; background: var(--field
       </div>
     </div>
     <div class="drop-tip glass" id="drop-tip" hidden></div>
-    <div class="rt-badge glass" id="rt-badge" hidden></div>
+    <div class="render-block" id="render-block" hidden></div>
+    <div class="render glass" id="render" role="dialog" aria-label="Photo render" hidden>
+      <div class="r-head"><b>Photo render</b>
+        <select id="r-target" aria-label="Quality"><option value="32">Quick · 32 samples</option><option value="128" selected>Good · 128 samples</option><option value="512">Best · 512 samples</option></select>
+      </div>
+      <div class="r-bar"><i id="r-fill"></i></div>
+      <p class="r-status" id="r-status" aria-live="polite"></p>
+      <div class="btns"><button class="btn primary" id="r-save" type="button" hidden>Save PNG</button><button class="btn" id="r-stop" type="button">Stop</button><button class="btn ghost" id="r-close" type="button">Close</button></div>
+    </div>
     <div class="gfx-msg glass" id="gfx-msg" role="alert" hidden><b></b><span></span><button class="btn primary" type="button" id="gfx-reload">Reload</button></div>
   </section>
 
@@ -655,33 +671,51 @@ Object.assign(sun.shadow.camera, { left: -360, right: 360, top: 360, bottom: -36
 sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.4; scene.add(sun);
 const rim = new THREE.DirectionalLight(0xdfe8ff, 1.4); rim.position.set(-260, 160, -220); scene.add(rim);
 
-// ---------- path tracing (Cycles-style) ----------
-// Loaded only when switched on. It traces only while nothing moves: any drag, camera move or
-// servo motion shows the normal real-time view, and tracing restarts once things are still.
-// It stops at MAX_SAMPLES so an idle page doesn't keep the graphics card busy.
-const MAX_SAMPLES = 512, IDLE_MS = 220;
-const PT = { lib: null, tracer: null, env: null, loading: false, sceneDirty: true, lastChange: 0, failed: false };
-async function loadPathTracer() {
-  if (PT.tracer || PT.loading || PT.failed) return;
-  PT.loading = true; setRtBadge('Loading ray tracer…');
-  try {
-    PT.lib = await import('three-gpu-pathtracer');
-    const t = new PT.lib.WebGLPathTracer(renderer);
-    t.tiles.set(3, 3);           // spread each sample over 9 frames so the page stays responsive
-    t.renderScale = Math.min(1, 1 / renderer.getPixelRatio()); // trace at CSS resolution on high-DPI screens
-    t.bounces = 4;
-    t.filterGlossyFactor = 0.5;  // cuts fireflies on shiny parts
-    t.minSamples = 3; t.renderDelay = 0; t.fadeDuration = 350;
-    t.dynamicLowRes = false; t.rasterizeScene = true;
-    t.rasterizeSceneCallback = (sc, cam) => renderer.render(sc, cam);
-    PT.env = new PT.lib.GradientEquirectTexture(256);
-    PT.env.topColor.set(0xf3f1ec); PT.env.bottomColor.set(0x6e6a62); PT.env.exponent = 1.6; PT.env.update();
-    PT.tracer = t; PT.sceneDirty = true;
-  } catch (err) {
-    PT.failed = true; S.rt = false; syncRtButton();
-    toast('The ray tracer could not load. Check your connection and try again.');
+// ---------- drawing with adaptive resolution ----------
+// The page draws only when something changed, so an idle bench costs nothing.
+// While things move on a slow graphics chip, frames are drawn at a lower resolution to stay smooth;
+// as soon as everything is still, one frame is drawn at full sharpness.
+const DPR_MAX = Math.min(1.75, window.devicePixelRatio || 1), DPR_MIN = Math.min(DPR_MAX, 0.7);
+const DYN = { scale: DPR_MAX, ema: 0, lastDraw: -1e9, lastChange: 0 };
+let stale = true;
+function renderRaster() { renderer.render(scene, camera); }
+function renderOverlay() { renderer.autoClear = false; renderer.clearDepth(); renderer.render(overlay, camera); renderer.autoClear = true; }
+function setDpr(r) { if (Math.abs(renderer.getPixelRatio() - r) > 0.01) renderer.setPixelRatio(r); }
+function renderFrame(now, changed) {
+  if (changed) {
+    stale = true; DYN.lastChange = now;
+    const gap = now - DYN.lastDraw;
+    if (gap < 60) { // continuous motion: judge the frame time
+      DYN.ema = DYN.ema ? DYN.ema * 0.85 + gap * 0.15 : gap;
+      if (DYN.ema > 24 && DYN.scale > DPR_MIN) { DYN.scale = Math.max(DPR_MIN, DYN.scale * 0.85); DYN.ema = 0; }
+      else if (DYN.ema < 12 && DYN.scale < DPR_MAX) DYN.scale = Math.min(DPR_MAX, DYN.scale * 1.03);
+    }
+    setDpr(DYN.scale);
+  } else if (!stale && renderer.getPixelRatio() < DPR_MAX - 0.01 && now - DYN.lastChange > 180) {
+    setDpr(DPR_MAX); stale = true; // settled: one sharp frame
   }
-  PT.loading = false;
+  if (!stale) return;
+  renderRaster(); renderOverlay(); stale = false; DYN.lastDraw = now;
+}
+
+// ---------- photo render (Cycles-style path tracing) ----------
+// Like Blender's F12: the view freezes, the path tracer prepares once, then adds samples until done.
+// No live tracing: on built-in graphics the tracer's shader alone takes a long time to compile,
+// and nothing else is drawn while it compiles so the computer stays responsive.
+const PT = { lib: null, tracer: null, env: null };
+const RENDER = { active: false, phase: '', t0: 0, png: null };
+async function loadPathTracer() {
+  if (PT.tracer) return PT.tracer;
+  PT.lib = await import('three-gpu-pathtracer');
+  const t = new PT.lib.WebGLPathTracer(renderer);
+  t.bounces = 4;
+  t.filterGlossyFactor = 0.5;  // cuts fireflies on shiny parts
+  t.minSamples = 1; t.renderDelay = 0; t.fadeDuration = 0;
+  t.dynamicLowRes = false; t.rasterizeScene = true;
+  t.rasterizeSceneCallback = (sc, cam) => renderer.render(sc, cam);
+  PT.env = new PT.lib.GradientEquirectTexture(256);
+  PT.env.topColor.set(0xf3f1ec); PT.env.bottomColor.set(0x6e6a62); PT.env.exponent = 1.6; PT.env.update();
+  PT.tracer = t; return t;
 }
 // Hand the current scene to the tracer. Its environment must be a panorama, so swap in the studio gradient.
 function syncTracerScene() {
@@ -690,75 +724,81 @@ function syncTracerScene() {
   PT.tracer.setScene(scene, camera);
   outlinesVisible(true);
   scene.environment = keep; scene.environmentIntensity = 1;
-  PT.sceneDirty = false;
 }
 function outlinesVisible(on) { for (const id in objs) objs[id].outline.visible = on && id === S.sel; }
-function setRtBadge(text) { const b = $('#rt-badge'); if (!text) { b.hidden = true; return; } b.hidden = false; b.textContent = text; }
-function syncRtButton() { $('#t-rt').setAttribute('aria-pressed', !!S.rt); if (!S.rt) setRtBadge(''); }
-function toggleRayTracing() {
-  S.rt = !S.rt; dirty = true; stale = true; syncRtButton();
-  if (S.rt) {
-    PT.failed = false; loadPathTracer(); PT.sceneDirty = true; PT.lastChange = 0;
-    GUARD.ema = 16; GUARD.slow = 0; GUARD.settle = 0;
-    toast('Ray tracing on · it refines while nothing moves and backs off if your computer slows down');
+const rTarget = () => +$('#r-target').value;
+function renderUi(status, frac) {
+  $('#r-status').textContent = status;
+  $('#r-fill').style.width = `${Math.round(clamp(frac, 0, 1) * 100)}%`;
+  const done = RENDER.phase === 'done' || RENDER.phase === 'error';
+  $('#r-stop').hidden = done; $('#r-save').hidden = RENDER.phase !== 'done';
+}
+async function startRender() {
+  if (RENDER.active) return;
+  if (!S.servos.length) { toast('Add a servo first'); return; }
+  stopPlay();
+  RENDER.active = true; RENDER.phase = 'loading'; RENDER.png = null;
+  $('#render').hidden = false; $('#render-block').hidden = false; $('#t-rt').setAttribute('aria-pressed', 'true');
+  renderUi('Loading the ray tracer…', 0);
+  try {
+    const t = await loadPathTracer();
+    if (!RENDER.active) return;
+    RENDER.phase = 'scene'; renderUi('Building the scene…', 0);
+    await new Promise(r => setTimeout(r, 30)); // let the status paint before the heavy step
+    if (!RENDER.active) return;
+    setDpr(DPR_MAX);
+    t.tiles.set(2, 2);
+    t.renderScale = Math.min(1, 1 / renderer.getPixelRatio()); // trace at screen resolution, not device pixels
+    t.pausePathTracing = false;
+    syncTracerScene();
+    t.renderSample(); // starts shader compiling
+    RENDER.phase = 'prep'; RENDER.t0 = performance.now();
+  } catch (err) {
+    RENDER.phase = 'error'; renderUi('The ray tracer could not load. Check your internet connection and try again.', 0);
   }
-  else toast('Ray tracing off');
 }
-function renderRaster() {
-  renderer.render(scene, camera);
+function renderTick(now, dt) {
+  const t = PT.tracer; if (!t) return;
+  if (RENDER.phase === 'prep') {
+    // Nothing is drawn while the shader compiles, so the graphics chip only does the compile.
+    if (t.isCompiling) { renderUi(`Preparing the ray tracer… ${Math.round((now - RENDER.t0) / 1000)} s. The first render takes longer on built-in graphics.`, 0.02); return; }
+    RENDER.phase = 'run'; RENDER.t0 = now;
+  }
+  if (RENDER.phase !== 'run') return;
+  // Smaller slices of work per frame when the chip is slow, so the page never freezes.
+  if (dt > 60 && t.tiles.x < 8) t.tiles.set(t.tiles.x + 1, t.tiles.y + 1);
+  t.renderSample();
+  const n = t.samples, goal = rTarget();
+  renderUi(`Rendering · ${Math.floor(n)} / ${goal} samples`, n / goal);
+  if (n >= goal) finishRender();
 }
-function renderOverlay() {
-  renderer.autoClear = false; renderer.clearDepth(); renderer.render(overlay, camera); renderer.autoClear = true;
-}
-// The page draws only when something changed, so an idle bench costs almost nothing.
-let stale = true;
-// Frame-time guard for ray tracing: slow frames mean the graphics card is overloaded.
-const GUARD = { ema: 16, slow: 0, settle: 0, warm: 0 };
-function guardTracing(dt) {
+function finishRender() {
   const t = PT.tracer;
-  // Scene building and shader compiling make the first frames slow on any computer; don't judge those.
-  if (GUARD.warm > 0 || PT.tracer.isCompiling) { GUARD.warm = Math.max(0, GUARD.warm - 1); GUARD.slow = 0; GUARD.ema = 16; return true; }
-  GUARD.ema = GUARD.ema * 0.8 + dt * 0.2;
-  GUARD.slow = dt > 250 ? GUARD.slow + 1 : 0;
-  if (GUARD.slow >= 2) { stopTracing('Ray tracing turned off: this computer’s graphics are too slow for it'); return false; }
-  if (GUARD.settle > 0) { GUARD.settle--; return true; }
-  if (GUARD.ema > 40) {
-    if (t.tiles.x < 5) t.tiles.set(t.tiles.x + 1, t.tiles.y + 1);     // smaller slice of work per frame
-    else if (t.renderScale > 0.45) t.renderScale *= 0.8;              // fewer pixels
-    else { stopTracing('Ray tracing turned off to keep your computer responsive'); return false; }
-    GUARD.settle = 12; GUARD.ema = 16;
-  }
-  return true;
+  if (t && t.samples >= 1) {
+    t.pausePathTracing = true; t.renderSample();
+    // Read the picture in the same task it was drawn, then put it on the stage-coloured background.
+    const out = document.createElement('canvas'); out.width = canvas.width; out.height = canvas.height;
+    const g = out.getContext('2d'), cs = getComputedStyle(document.documentElement);
+    const grad = g.createRadialGradient(out.width / 2, out.height * 0.25, 0, out.width / 2, out.height * 0.25, out.width * 0.9);
+    grad.addColorStop(0, cs.getPropertyValue('--stage-1').trim() || '#f6f7f5'); grad.addColorStop(1, cs.getPropertyValue('--stage-2').trim() || '#c9d2cd');
+    g.fillStyle = grad; g.fillRect(0, 0, out.width, out.height); g.drawImage(canvas, 0, 0);
+    RENDER.png = out;
+    RENDER.phase = 'done'; renderUi(`Done · ${Math.floor(t.samples)} samples. Close to go back to editing.`, 1);
+  } else closeRender();
 }
-function stopTracing(msg) { S.rt = false; syncRtButton(); stale = true; toast(msg); }
-function renderFrame(now, changed, dt) {
-  // Overlay-only changes (selection, handles) don't restart the trace.
-  if (changed && changed !== 'overlay') PT.lastChange = now;
-  if (changed === 'scene') PT.sceneDirty = true;
-  if (changed) stale = true;
-  const tracing = S.rt && PT.tracer && changed !== 'scene' && changed !== 'camera' && now - PT.lastChange > IDLE_MS;
-  if (!tracing) {
-    if (S.rt && PT.tracer && changed) setRtBadge('Ray tracing pauses while things move');
-    if (!stale) return;
-    renderRaster(); renderOverlay(); stale = false;
-    return;
-  }
-  const n = Math.floor(PT.tracer.samples);
-  if (n >= MAX_SAMPLES && !PT.sceneDirty && !camMoved) {
-    // Finished: show the final image once, then stay idle.
-    if (stale) { PT.tracer.pausePathTracing = true; PT.tracer.renderSample(); renderOverlay(); stale = false; }
-    setRtBadge(`Ray traced · ${MAX_SAMPLES} samples`);
-    return;
-  }
-  if (!guardTracing(dt)) return;
-  if (PT.sceneDirty) { syncTracerScene(); camMoved = false; GUARD.warm = 4; }
-  else if (camMoved) { PT.tracer.updateCamera(); camMoved = false; }
-  PT.tracer.pausePathTracing = false;
-  PT.tracer.renderSample(); renderOverlay(); stale = true;
-  setRtBadge(`Ray tracing · ${n} / ${MAX_SAMPLES} samples`);
+function closeRender() {
+  RENDER.active = false; RENDER.phase = ''; if (PT.tracer) PT.tracer.pausePathTracing = true;
+  $('#render').hidden = true; $('#render-block').hidden = true; $('#t-rt').setAttribute('aria-pressed', 'false');
+  renderer.setRenderTarget(null); renderer.shadowMap.needsUpdate = true; stale = true; poseDirty = true;
 }
-// Nothing to draw while the tab is hidden; browsers pause animation frames then, but be explicit.
-document.addEventListener('visibilitychange', () => { if (!document.hidden) { stale = true; GUARD.ema = 16; GUARD.slow = 0; } });
+$('#r-stop').addEventListener('click', () => { if (RENDER.phase === 'run') finishRender(); else closeRender(); });
+$('#r-close').addEventListener('click', closeRender);
+$('#r-save').addEventListener('click', () => {
+  if (!RENDER.png) return;
+  RENDER.png.toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'servo-bench-render.png'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); }, 'image/png');
+});
+$('#r-target').addEventListener('change', () => { if (RENDER.phase === 'done' && PT.tracer && PT.tracer.samples < rTarget()) { RENDER.phase = 'run'; PT.tracer.pausePathTracing = false; renderUi('Rendering…', PT.tracer.samples / rTarget()); } });
+document.addEventListener('visibilitychange', () => { if (!document.hidden) stale = true; });
 
 function canvasTex(w, h, draw, srgb = true) {
   const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h);
@@ -1030,7 +1070,7 @@ function rebuild(only) {
   for (const id in objs) pickables.push(objs[id].pHorn, objs[id].pBody);
   for (const id in trails) { const s = byId(id); if (!s || !s.trace) clearTrail(id); }
   applyHighlight();
-  poseDirty = true; dirty = true; PT.sceneDirty = true;
+  poseDirty = true; dirty = true;
 }
 
 const TMAX = 6000;
@@ -1557,14 +1597,15 @@ $('#t-move').addEventListener('click', () => setHandleMode('move'));
 $('#t-rot').addEventListener('click', () => setHandleMode('rotate'));
 $('#t-del').addEventListener('click', removeSel);
 $('#t-view').addEventListener('click', resetView);
-$('#t-rt').addEventListener('click', toggleRayTracing);
+$('#t-rt').addEventListener('click', () => { if (RENDER.active) closeRender(); else startRender(); });
 $('#t-clear').addEventListener('click', () => { Object.keys(trails).forEach(clearTrail); poseDirty = true; toast('Cleared paths'); });
 document.addEventListener('keydown', e => {
   if (e.target.closest('input, textarea, select') || e.ctrlKey || e.metaKey || e.altKey || document.querySelector('dialog[open]')) return;
+  if (RENDER.active) { if (e.key === 'Escape') { e.preventDefault(); if (RENDER.phase === 'run') finishRender(); else closeRender(); } return; }
   const k = e.key.toLowerCase(), s = byId(S.sel), step = e.shiftKey ? 1 : 5;
   const moves = { arrowleft: [0, -step], arrowright: [0, step], arrowup: [2, -step], arrowdown: [2, step], pageup: [1, step], pagedown: [1, -step] };
   if (moves[k]) { if (!s) return; nudge(s, moves[k][0], moves[k][1]); }
-  else if (k === 'l') toggleRayTracing();
+  else if (k === 'l') startRender();
   else if (k === 'w') setHandleMode('move'); else if (k === 'e') setHandleMode('rotate');
   else if (k === 'r') doTurn(); else if (k === 't') doTip();
   else if (k === 'delete' || k === 'backspace') removeSel(); else return;
@@ -1880,6 +1921,7 @@ let last = performance.now();
 function tick(now) {
   requestAnimationFrame(tick);
   const rawMs = now - last, dt = Math.min(0.05, rawMs / 1000); last = now;
+  if (RENDER.active) { renderTick(now, rawMs); return; } // the scene is frozen while a photo renders
   let moved = false;
   for (const s of S.servos) {
     const r = rt[s.id]; if (!r) continue;
@@ -1901,13 +1943,16 @@ function tick(now) {
   if (!changed && camFrame) changed = 'camera';
   if (!changed && redraw) changed = 'overlay';
   redraw = false;
-  renderFrame(now, changed, rawMs);
+  renderFrame(now, changed);
 }
 setInterval(() => { if (dirty) { save(); dirty = false; } }, 800);
 
-S = load() || Object.assign(fromPreset('start'), { realistic: true, rt: false });
+// Link options: ?example=arm3 opens an example build, ?theme=light|dark forces a theme, ?tips=0 hides the tips card.
+const params = new URLSearchParams(location.search), exKey = params.get('example'), theme = params.get('theme');
+if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+if (params.get('tips') === '0') $('#help').hidden = true;
+S = (exKey && PRESETS[exKey] && exKey !== 'empty' && Object.assign(fromPreset(exKey), { realistic: true, rt: false })) || load() || Object.assign(fromPreset('start'), { realistic: true, rt: false });
 $('#g-real').checked = S.realistic;
-syncRtButton(); if (S.rt) loadPathTracer();
 rebuild(); renderList(); renderInspector(); syncToolbar(); resetView(); renderSteps();
 requestAnimationFrame(tick);
 })();
