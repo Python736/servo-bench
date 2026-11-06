@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 💬 Show your build or ask a question
+    url: https://github.com/Python736/servo-bench/discussions
+    about: Share what you made with Servo Bench, or ask how to do something.
+  - name: ☕ Support the project
+    url: https://buymeacoffee.com/python736
+    about: Servo Bench is free and ad-free. Coffees keep it that way.

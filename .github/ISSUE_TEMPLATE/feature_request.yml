@@ -1,0 +1,23 @@
+name: ✨ Feature request
+description: A servo, part or feature you'd like to see
+labels: ["enhancement"]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of idea?
+      options:
+        - A new servo model
+        - A bracket, horn or printed part
+        - Code export (boards, drivers, libraries)
+        - Editing and controls
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Describe it
+      description: What would you build with it? Links to datasheets or products help.
+    validations:
+      required: true

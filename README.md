@@ -14,16 +14,24 @@
   <b>No install · No account · Runs in any modern browser</b>
 </p>
 
+<p align="center">
+  <a href="#-features">Features</a> ·
+  <a href="#-from-idea-to-real-robot">Idea → robot</a> ·
+  <a href="#-example-builds">Examples</a> ·
+  <a href="#%EF%B8%8F-controls">Controls</a> ·
+  <a href="#-faq">FAQ</a> ·
+  <a href="#%EF%B8%8F-roadmap">Roadmap</a> ·
+  <a href="#%EF%B8%8F-support">Support</a>
+</p>
+
 <br>
 
 <p align="center">
   <a href="https://python736.github.io/servo-bench/?example=arm3">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="assets/screenshot-dark.png">
-      <source media="(prefers-color-scheme: light)" srcset="assets/screenshot-light.png">
-      <img src="assets/screenshot-light.png" alt="Servo Bench showing a 4-servo robot arm on a cutting mat, with the servo list and inspector on the right" width="100%">
-    </picture>
+    <img src="assets/demo.gif" alt="Animated demo: a 4-servo robot arm plays back three saved poses at real servo speed while the camera orbits, drawing the path of the arm tip" width="100%">
   </a>
+  <br>
+  <sub>A 4-servo arm playing back 3 saved poses at real SG90 speed. <a href="https://python736.github.io/servo-bench/?example=arm3"><b>Try it yourself →</b></a></sub>
 </p>
 
 ## Why Servo Bench?
@@ -135,15 +143,55 @@ Open any of these straight in the app:
 | Nudge | Arrow keys, <kbd>PageUp</kbd> / <kbd>PageDown</kbd> (hold <kbd>Shift</kbd> for 1 mm) |
 | Photo render | <kbd>L</kbd>, or the **Render** button. <kbd>Esc</kbd> stops it |
 | Remove | <kbd>Delete</kbd> |
+| Deselect | <kbd>Esc</kbd>, or click empty space |
 | Camera | Drag empty space to orbit, right-drag to pan, scroll to zoom |
 
 ## 💻 Run it locally
 
 There's nothing to install or build. Download the repo and open `index.html` in Chrome, Edge or Firefox. It loads [three.js](https://threejs.org) from a CDN, so it needs internet the first time.
 
-Link options: `?example=arm3` opens an example, `?theme=light` or `?theme=dark` forces a theme, and `?tips=0` hides the tips card.
+Link options: `?example=arm3` opens an example, `?theme=light` or `?theme=dark` forces a theme, `?quality=low` or `?quality=high` forces a graphics mode, and `?tips=0` hides the tips card.
 
 > **Laptop with two graphics chips?** If the 3D view feels slow, set your browser to **High performance** in *Windows Settings → System → Display → Graphics*. The app also lowers its resolution automatically while things move, and goes back to full sharpness when they stop.
+
+## 🖼️ Light and dark
+
+<p align="center">
+  <img src="assets/screenshot-light.png" alt="Servo Bench in light theme" width="49%">
+  <img src="assets/screenshot-dark.png" alt="Servo Bench in dark theme" width="49%">
+</p>
+
+## ❓ FAQ
+
+<details>
+<summary><b>Is it really free? What's the catch?</b></summary>
+
+It's free and open source under the MIT license, with no ads, account or tracking. If it helps you, you can [buy me a coffee](https://buymeacoffee.com/python736).
+</details>
+
+<details>
+<summary><b>How accurate are the servos?</b></summary>
+
+Case, tab and shaft positions come from typical datasheet drawings, in millimetres. Speeds are rated speeds at 4.8–5 V with no load. Real servos vary a little between brands and batches, so leave a few millimetres of margin.
+</details>
+
+<details>
+<summary><b>Will the Arduino code work with my servos?</b></summary>
+
+It uses the standard `Servo` library (or `ESP32Servo` on ESP32) with pulse ranges that suit SG90, MG90S and MG996R. Power the servos from a separate 5–6 V supply and connect its GND to the board's GND. The parts list suggests how many amps you need.
+</details>
+
+<details>
+<summary><b>Can I use it offline or on my phone?</b></summary>
+
+It works on phones and tablets: drag with one finger, pinch to zoom. It needs an internet connection, because the 3D library loads from a CDN.
+</details>
+
+<details>
+<summary><b>It's slow on my laptop.</b></summary>
+
+The app detects built-in graphics and switches to lighter settings automatically. If your laptop has two graphics chips, set your browser to **High performance** in *Windows Settings → System → Display → Graphics*. You can also force a mode with `?quality=low` or `?quality=high`.
+</details>
 
 ## 🗺️ Roadmap
 
@@ -157,7 +205,7 @@ Link options: `?example=arm3` opens an example, `?theme=light` or `?theme=dark` 
 - [ ] Inverse kinematics: drag the arm tip and the joints follow
 - [ ] Export to STL for 3D printing
 
-Have an idea? [Open an issue](https://github.com/Python736/servo-bench/issues/new).
+Have an idea? [Suggest a feature](https://github.com/Python736/servo-bench/issues/new/choose) or [show off your build](https://github.com/Python736/servo-bench/discussions). Want to help build it? See [CONTRIBUTING.md](CONTRIBUTING.md). Adding a new servo model is a great first contribution.
 
 ## ❤️ Support
 
@@ -175,6 +223,12 @@ Servo Bench is free, open source and ad-free. If it saved you time or a burnt-ou
 Donation buttons and the Amazon affiliate tag live in the `window.SERVO_BENCH` block in `index.html`. A service only shows up once its username is filled in. The GitHub Sponsor button is set in `.github/FUNDING.yml`.
 
 </details>
+
+## 📈 Star history
+
+<a href="https://star-history.com/#Python736/servo-bench&Date">
+  <img src="https://api.star-history.com/svg?repos=Python736/servo-bench&type=Date" alt="Star history chart" width="600">
+</a>
 
 ## 🧱 Built with
 

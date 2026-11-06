@@ -4,6 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Servo Bench: a free, real-size 3D servo simulator. Snap SG90, MG90S and MG996R servos together and see how your build moves.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Servo Bench: build servo robots in 3D">
+<meta property="og:description" content="Free, real-size 3D servo simulator in your browser. Snap SG90 / MG90S / MG996R servos together, animate them, and export Arduino code.">
+<meta property="og:url" content="https://python736.github.io/servo-bench/">
+<meta property="og:image" content="https://python736.github.io/servo-bench/assets/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0f1714">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='9' fill='%23e0661c'/%3E%3Cg fill='none' stroke='%23fff' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='6' y='17' width='18' height='15' rx='2.5'/%3E%3Ccircle cx='12' cy='17' r='4'/%3E%3Cpath d='M12 17l19-9'/%3E%3C/g%3E%3C/svg%3E">
 <title>Servo Bench</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -261,6 +271,7 @@ pre.code { margin: 0; max-height: 300px; overflow: auto; background: var(--field
 
 .toast { position: fixed; left: 50%; top: calc(18px + env(safe-area-inset-top, 0px)); transform: translateX(-50%); background: var(--fg); color: var(--bg); padding: 9px 16px; border-radius: 999px; font-size: 14px; font-weight: 500; z-index: 20; max-width: calc(100% - 32px); box-shadow: var(--shadow); }
 
+@media (max-width: 1500px) { #t-support .lbl-long { display: none; } }
 @media (max-width: 860px) {
   html, body { height: auto; }
   .app { grid-template-columns: minmax(0, 1fr); height: auto; }
@@ -293,8 +304,7 @@ pre.code { margin: 0; max-height: 300px; overflow: auto; background: var(--field
         <span class="tsep"></span>
         <button class="tb" id="t-clear" type="button" title="Clear drawn paths"><svg viewBox="0 0 24 24"><path d="M3 17c3-6 6 2 9-4s6 0 9-6"/><path d="M4 21L20 5"/></svg><span class="lbl-long">Clear paths</span></button>
         <button class="tb" id="t-view" type="button" title="Frame the whole build"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span class="lbl-long">Fit view</span></button>
-      </div>
-      <div class="tgroup glass">
+        <span class="tsep"></span>
         <button class="tb heart" id="t-support" type="button" title="Support Servo Bench"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg><span class="lbl-long">Support</span></button>
       </div>
     </div>
@@ -1493,6 +1503,14 @@ function setAngle(s, v) {
   const rng = document.getElementById('ang-' + s.id); if (rng && +rng.value !== s.angle) { rng.value = s.angle; paint(rng); }
   dirty = true;
 }
+// A click (no drag) on empty space, or Esc, deselects the current servo.
+let downOnEmpty = false;
+canvas.addEventListener('pointerdown', e => { downOnEmpty = e.button === 0 && !drag; }); // registered after the main handler, so drag is already set
+canvas.addEventListener('pointerup', e => {
+  if (!downOnEmpty || !downAt || e.button !== 0) return;
+  downOnEmpty = false;
+  if (Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) < 5 && S.sel) select(null);
+});
 function select(id) {
   S.sel = id;
   listEl.querySelectorAll('.row').forEach(r => r.classList.toggle('sel', r.dataset.id === id));
@@ -1672,6 +1690,7 @@ document.addEventListener('keydown', e => {
   const k = e.key.toLowerCase(), s = byId(S.sel), step = e.shiftKey ? 1 : 5;
   const moves = { arrowleft: [0, -step], arrowright: [0, step], arrowup: [2, -step], arrowdown: [2, step], pageup: [1, step], pagedown: [1, -step] };
   if (moves[k]) { if (!s) return; nudge(s, moves[k][0], moves[k][1]); }
+  else if (k === 'escape') { if (S.sel) select(null); }
   else if (k === 'l') startRender();
   else if (k === 'w') setHandleMode('move'); else if (k === 'e') setHandleMode('rotate');
   else if (k === 'r') doTurn(); else if (k === 't') doTip();
